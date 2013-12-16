@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Audio test page</title>
+
+        <link rel="stylesheet" media="screen" href="../../src/css/style.css" />
+        <link rel="stylesheet" media="screen" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+
+        <script src="../../src/lib/infusion/MyInfusion.js"></script>
+        <script src="../../src/js/indicator.js"></script>
+        <script src="../../src/js/audioPanel.js"></script>
+    </head>
+
+    <body id="body">
+        <!-- Test HTML -->
+        <div class="flc-audio"></div>
+
+        <script type="text/javascript">
+            var that = fluid.metadata.audioPanel(".flc-audio", {
+                resources: {
+                    template: {
+                        url: "../../src/html/audio-template.html"
+                    }
+                },
+                audioAttributesTemplate: "../../src/html/audio-attributes-template.html",
+                model: {
+                    audio: "available"
+                },
+                listeners: {
+                    onReady: function (that) {
+                        // that.applier.requestChange("audio", "available");
+                        // that.applier.requestChange("dialogue", true);
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

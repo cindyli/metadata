@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Video test page</title>
+
+        <link rel="stylesheet" media="screen" href="../../src/css/style.css" />
+        <link rel="stylesheet" media="screen" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+
+        <script src="../../src/lib/infusion/MyInfusion.js"></script>
+        <script src="../../src/js/indicator.js"></script>
+        <script src="../../src/js/videoPanel.js"></script>
+    </head>
+
+    <body id="body">
+        <!-- Test HTML -->
+        <div class="flc-video"></div>
+
+        <script type="text/javascript">
+            var that = fluid.metadata.videoPanel(".flc-video", {
+                resources: {
+                    template: {
+                        url: "../../src/html/video-template.html"
+                    }
+                },
+                model: {
+                    highContrast: true
+                },
+                listeners: {
+                    onReady: function (that) {
+                        that.applier.requestChange("flashing", "flashing");
+                        that.applier.requestChange("signLang", true);
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
