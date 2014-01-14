@@ -85,7 +85,7 @@ var fluid_1_5 = fluid_1_5 || {};
         },
         listeners: {
             "onCreate.init": "fluid.metadata.statusPanel.init",
-            "afterRender.bindClick": {
+            "onReady.bindClick": {
                 listener: "fluid.metadata.statusPanel.bindClick",
                 args: ["{that}.container", "{that}.options.selectors.detail", "{that}.options.typeSelector", "{that}.events.onMetadataSelected.fire"]
             }
@@ -120,7 +120,6 @@ var fluid_1_5 = fluid_1_5 || {};
         var regexRule = fluid.stringTemplate(typeSelector, {type: "(.*)"});
 
         fluid.each(indicators, function (indicator) {
-            console.log("binding", indicator);
             indicator = $(indicator);
             var indicatorClass = indicator.attr("class");
 
@@ -128,7 +127,6 @@ var fluid_1_5 = fluid_1_5 || {};
                 fluid.each(indicatorClass.split(/\s/), function (oneSelector) {
                     var found = oneSelector.match(/fl-(.*)-icon/);
                     if (found && found[1]) {
-                        console.log("firing for " + found[1]);
                         fireSelectedEvent(found[1]);
                         return;
                     }
@@ -137,19 +135,20 @@ var fluid_1_5 = fluid_1_5 || {};
         });
     };
 
-    // To transform the input model structure from:
-    // {
-    //     "audio": "available",
-    //     "video": "unavailable"
-    // }
-    // to:
-    // toShow: [{
-    //     type: "audio",
-    //     state: "available",
-    // }, {
-    //     type: "video",
-    //     state: "unavailable"
-    // }]
+    /** To transform the input model structure from:
+    {
+        "audio": "available",
+        "video": "unavailable"
+    }
+    to:
+    toShow: [{
+        type: "audio",
+        state: "available",
+    }, {
+        type: "video",
+        state: "unavailable"
+    }]
+    **/
     fluid.metadata.statusPanel.transform = function (existingModel, newModel) {
         if (!newModel) {
             return existingModel;

@@ -60,6 +60,29 @@ https://github.com/gpii/universal/LICENSE.txt
 
     });
 
+    jqUnit.asyncTest("The clicks on indicator icons trigger the metadataSelected event", function () {
+        var statusPanel = fluid.metadata.statusPanel(".flc-status-testClick", {
+            model: {
+                audio: "unavailable",
+                video: "unavailable"
+            },
+            resources: {
+                template: {
+                    url: "../../src/html/status-template.html"
+                }
+            },
+            listeners: {
+                onReady: function (that) {
+                    that.container.find(".fl-audio-icon").click();
+                },
+                onMetadataSelected: function (indicatorType) {
+                    jqUnit.assertEquals("The onMetadataSelected is fired with a proper indicator type", "audio", indicatorType);
+                    jqUnit.start();
+                }
+            }
+        });
+    });
+
     fluid.defaults("fluid.tests.statusPanelTests", {
         gradeNames: ["fluid.test.testEnvironment", "autoInit"],
         components: {
@@ -75,11 +98,6 @@ https://github.com/gpii/universal/LICENSE.txt
                     resources: {
                         template: {
                             url: "../../src/html/status-template.html"
-                        }
-                    },
-                    listeners: {
-                        onMetadataSelected: function (type) {
-                            console.log("onMetadataSelected fired with " + type);
                         }
                     }
                 }
@@ -116,17 +134,6 @@ https://github.com/gpii/universal/LICENSE.txt
         };
     };
 
-    fluid.tests.clickIndicator = function (container, indicatorType) {
-        var selector = ".fl-" + indicatorType + "-icon";
-        console.log(container.find(selector));
-        container.find(selector).click();
-    };
-
-    fluid.tests.checkIndicatorClicked = function (indicatorType) {
-        console.log("in onMetadataselected listener");
-        jqUnit.assertEquals("The onMetadataSelected is fired with a proper indicator type", "audio", indicatorType);
-    };
-
     fluid.defaults("fluid.tests.statusPanelTester", {
         gradeNames: ["fluid.test.testCaseHolder", "autoInit"],
         testOptions: {
@@ -155,17 +162,6 @@ https://github.com/gpii/universal/LICENSE.txt
                     makerArgs: ["{statusPanel}", "{that}.options.testOptions.newModel"],
                     spec: {path: "*", priority: "last"},
                     changeEvent: "{statusPanel}.applier.modelChanged"
-                }]
-            }, {
-                expect: 1,
-                name: "The clicks on indicator icons trigger the metadataSelected event",
-                sequence: [{
-                    listenerMaker: "fluid.tests.clickIndicator",
-                    makerArgs: ["{statusPanel}.container", "audio"],
-                    event: "{statusPanel}.events.onReady"
-                }, {
-                    listener: "fluid.tests.checkIndicatorClicked",
-                    event: "{statusPanelTests statusPanel}.events.onMetadataSelected"
                 }]
             }]
         }]
