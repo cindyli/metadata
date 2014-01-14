@@ -61,6 +61,9 @@ var fluid_1_5 = fluid_1_5 || {};
             audioUnavailable: "Audio Attribute is unavailable."
         },
         controlValues: ["available", "unavailable", "unknown"],
+        styles: {
+            audioIcon: "fl-audio-icon"
+        },
         selectors: {
             title: ".flc-audio-title",
             instruction: ".flc-audio-instruction",
@@ -87,6 +90,9 @@ var fluid_1_5 = fluid_1_5 || {};
                             "available": "${{that}.options.strings.audioAvailable}",
                             "unavailable": "${{that}.options.strings.audioUnavailable}",
                             "unknown": "${{that}.options.strings.audioUnavailable}"
+                        },
+                        styles: {
+                            metadataCss: "{that}.options.styles.audioIcon"
                         }
                     }
                 }

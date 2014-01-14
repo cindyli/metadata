@@ -53,7 +53,7 @@ var fluid_1_5 = fluid_1_5 || {};
             }
         },
         styles: {
-            circle: "fl-circle",
+            metadataCss: "fl-circle",
             indicatorState: {
                 available: "fl-available",
                 unavailable: "fl-unavailable",
@@ -70,7 +70,7 @@ var fluid_1_5 = fluid_1_5 || {};
             "onCreate.makeCircle": {
                 "this": "{that}.container",
                 method: "addClass",
-                args: "{that}.options.styles.circle"
+                args: "{that}.options.styles.metadataCss"
             },
             "onCreate.setDefaultState": {
                 listener: "{that}.applyChange",

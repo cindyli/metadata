@@ -42,6 +42,9 @@ var fluid_1_5 = fluid_1_5 || {};
             flashing: ["Yes", "No", "Not sure"]
         },
         controlValues: ["flashing", "noFlashing", "unknown"],
+        styles: {
+            videoIcon: "fl-video-icon"
+        },
         selectors: {
             title: ".flc-video-title",
             icon: ".flc-video-icon",
@@ -70,6 +73,9 @@ var fluid_1_5 = fluid_1_5 || {};
                         },
                         tooltipContent: {
                             "available": "Video attribute is available."
+                        },
+                        styles: {
+                            metadataCss: "{that}.options.styles.videoIcon"
                         }
                     }
                 }

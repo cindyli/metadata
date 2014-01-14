@@ -90,6 +90,9 @@ var fluid_1_5 = fluid_1_5 || {};
                         "available": "${captionsPanel}.options.strings.captionsAvailable",
                         "unavailable": "${captionsPanel}.options.strings.captionsUnavailable"
                     },
+                    styles: {
+                        metadataCss: "{captionsPanel}.options.styles.captionsIcon"
+                    },
                     events: {
                         onCreate: {
                             events: "{captionsPanel}.events.afterRenderIcon",
@@ -104,6 +107,9 @@ var fluid_1_5 = fluid_1_5 || {};
             instruction: "Captions provide a synchronized, equivalent text version of spoken word in a video.",
             captionsAvailable: "Captions are available in this video.",
             captionsUnavailable: "Captions are not available in this video."
+        },
+        styles: {
+            captionsIcon: "fl-captions-icon"
         },
         selectors: {
             title: ".flc-captions-title",

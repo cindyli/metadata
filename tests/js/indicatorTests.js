@@ -28,7 +28,7 @@ https://github.com/gpii/universal/LICENSE.txt
 
     fluid.tests.checkInitial = function (that) {
         var tooltip = $("[id^=ui-tooltip]");
-        jqUnit.assertTrue("The initial circle css has been applied", that.container.hasClass(that.options.styles.circle));
+        jqUnit.assertTrue("The initial metadata css has been applied", that.container.hasClass(that.options.styles.metadataCss));
         jqUnit.assertTrue("The tooltip css has been applied to the tooltip element", tooltip.hasClass(that.options.tooltipOptions.styles.tooltip));
         that.tooltip.open();
     };

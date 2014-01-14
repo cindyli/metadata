@@ -17,7 +17,7 @@
     Metadata indicators
 */
 
-.fl-circle {
+.fl-circle, .fl-video-icon, .fl-audio-icon, .fl-captions-icon {
     -webkit-border-radius: 999px;
     -moz-border-radius: 999px;
     border-radius: 999px;
@@ -29,7 +29,7 @@
     box-shadow: 0.03em 0.03em 0 #fff;
 }
 
-.fl-circle:before {
+.fl-circle:before, .fl-video-icon:before, .fl-audio-icon:before, .fl-captions-icon:before {
     font-family: 'FloeMetadataIcons';
     color: #fff;
     font-size: 1.4em;
@@ -41,15 +41,15 @@
     text-shadow: 0.03em 0.03em 0 #fff;
 }
 
-.fl-audioPanel .fl-circle:before  {
+.fl-audio-icon:before  {
     content: "\e607";
 }
 
-.fl-videoPanel .fl-circle:before  {
+.fl-video-icon:before  {
     content: "\e606";
 }
 
-.fl-captionsPanel .fl-circle:before  {
+.fl-captions-icon:before  {
     content: "\e602";
 }
 
@@ -83,7 +83,7 @@
 
 .fl-captionsPanel .fl-captions-list li:nth-of-type(odd){
     background-color: #d3e3e6;
-    
+
 }
 
 /* Bootstrap override */
