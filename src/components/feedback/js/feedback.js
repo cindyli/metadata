@@ -45,6 +45,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                     styles: {
                         activeCss: "{feedback}.options.styles.activeCss"
                     },
+                    selectors: {
+                        icon: "{feedback}.options.selectors.matchConfirmationIcon"
+                    },
                     modelListeners: {
                         "isActive": {
                             listener: "gpii.metadata.feedback.updateFeedbackModel",
@@ -70,6 +73,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                     },
                     styles: {
                         activeCss: "{feedback}.options.styles.activeCss"
+                    },
+                    selectors: {
+                        icon: "{feedback}.options.selectors.mismatchDetailsIcon"
                     },
                     modelListeners: {
                         "isActive": {
@@ -108,6 +114,28 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                     }
                 }
             },
+            tooltip: {
+                type: "gpii.metadata.feedback.tooltip",
+                container: "{feedback}.container",
+                createOnEvent: "onFeedbackMarkupReady",
+                options: {
+                    styles: {
+                        openIndicator: "{feedback}.options.styles.openIndicator"
+                    },
+                    selectorsMap: {
+                        "matchConfirmationIcon": {
+                            label: "matchConfirmationLabel",
+                            selectorForIndicatorStyle: "matchConfirmationButton"
+                        },
+                        "mismatchDetailsIcon": {
+                            label: "mismatchDetailsLabel",
+                            selectorForIndicatorStyle: "mismatchDetailsButton"
+                        }
+                    },
+                    selectors: "{feedback}.options.selectors",
+                    strings: "{feedback}.options.strings"
+                }
+            },
             dataSource: {
                 type: "gpii.pouchdb.dataSource",
                 options: {
@@ -123,11 +151,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         styles: {
             container: "gpii-feedback",
-            activeCss: "gpii-icon-active"
+            activeCss: "gpii-icon-active",
+            openIndicator: "gpii-icon-arrow"
         },
         selectors: {
             matchConfirmationButton: ".gpiic-matchConfirmation-button",
-            mismatchDetailsButton: ".gpiic-mismatchDetails-button"
+            matchConfirmationIcon: "#gpiic-matchConfirmation-icon",
+            mismatchDetailsButton: ".gpiic-mismatchDetails-button",
+            mismatchDetailsIcon: "#gpiic-mismatchDetails-icon"
         },
         model: {
             userData: {},

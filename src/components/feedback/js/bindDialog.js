@@ -24,7 +24,7 @@ var gpii = gpii || {};
      * 3. Once the content is ready, the container is instantiated into a jQuery dialog;
      * 4. When the dialog is ready, i) open it; ii) hook up event handlers that would close the dialog when clicking anywhere outside of the dialog.
      *
-     * Note: every click on the container triggers re-rendering of the dialog content using onRenderDialogContent event.
+     * Note: every click on the bindDialog button container triggers re-rendering of the dialog content using onRenderDialogContent event.
      **/
 
     "use strict";
@@ -140,7 +140,7 @@ var gpii = gpii || {};
     });
 
     fluid.defaults("gpii.metadata.feedback.bindDialog", {
-        gradeNames: ["fluid.viewRelayComponent", "gpii.metadata.feedback.trackFocus", "gpii.metadata.feedback.trackBlur", "gpii.metadata.feedback.tooltipHolder", "autoInit"],
+        gradeNames: ["fluid.viewRelayComponent", "gpii.metadata.feedback.trackFocus", "gpii.metadata.feedback.trackBlur"/*, "gpii.metadata.feedback.tooltipHolder"*/, "autoInit"],
         components: {
             renderDialogContent: {
                 type: "fluid.rendererRelayComponent",
@@ -149,13 +149,6 @@ var gpii = gpii || {};
                 options: {
                     gradeNames: ["{that}.options.panelType"]
                 }
-            },
-            tooltip: {
-                type: "gpii.metadata.feedback.dialogTooltip",
-                container: "{bindDialog}.dom.icon",
-                options: {
-                    content: "{bindDialog}.options.strings.buttonLabel"
-                }
             }
         },
         members: {
@@ -163,7 +156,7 @@ var gpii = gpii || {};
             dialogContainer: null
         },
         selectors: {
-            icon: ".gpiic-icon"
+            icon: ".gpiic-icon"   // need to be supplied for applying hover and focus stylings.
         },
         strings: {
             buttonLabel: null
