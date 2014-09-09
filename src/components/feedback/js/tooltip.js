@@ -40,9 +40,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         delay: 0,
         duration: 0,
-        selectorsMap: {}, // need to be supplied
-        selectors: {},    // need to be supplied
-        strings: {},      // need to be supplied
+        selectorsMap: {}, // need to be supplied, an object containing relationships of icons, buttons and corresponding labels
+        selectors: {},    // need to be supplied, contains selectors for icons and buttons
+        strings: {},      // need to be supplied, contains strings for tooltip contents
         model: {
             idToContent: {
                 expander: {
@@ -52,8 +52,12 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         },
         listeners: {
+            "onCreate.unbindESC": {
+                listener: "gpii.metadata.feedback.tooltip.unbindESC",
+                args: ["{that}.container"]
+            },
             "afterOpen.addOpenIndicator": "gpii.metadata.feedback.tooltip.addOpenIndicator({arguments}.1, {that})",
-            "afterClose.addOpenIndicator": "gpii.metadata.feedback.tooltip.removeOpenIndicator({arguments}.1, {that})"
+            "afterClose.removeOpenIndicator": "gpii.metadata.feedback.tooltip.removeOpenIndicator({arguments}.1, {that})"
         },
         invokers: {
             findElmForIndicatorStyle: {
@@ -96,6 +100,15 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
     gpii.metadata.feedback.tooltip.removeOpenIndicator = function (target, that) {
         var selectorForIndicatorStyle = that.findElmForIndicatorStyle(target.id);
         $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
+    };
+
+    gpii.metadata.feedback.tooltip.unbindESC = function (elm) {
+        var elms = elm.contents().addBack(); // self plus decendants
+        elms.keyup(function (e) {
+            if (e.keyCode === $.ui.keyCode.ESCAPE) {
+                e.stopImmediatePropagation();
+            }
+        });
     };
 
 })(jQuery, fluid);

@@ -19,7 +19,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
      */
 
     fluid.defaults("gpii.metadata.feedback", {
-        gradeNames: ["fluid.viewRelayComponent", "autoInit"],
+        gradeNames: ["fluid.viewRelayComponent", "gpii.metadata.feedback.dialog", "autoInit"],
         members: {
             databaseName: {
                 expander: {
@@ -37,13 +37,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             bindMatchConfirmation: {
                 type: "gpii.metadata.feedback.bindMatchConfirmation",
                 container: "{feedback}.dom.matchConfirmationButton",
-                createOnEvent: "onFeedbackMarkupReady",
+                createOnEvent: "onPrepReady",
                 options: {
+                    dialogContainer: "{feedback}.dialogContainer",
                     strings: {
                         buttonLabel: "{feedback}.options.strings.matchConfirmationLabel"
                     },
                     styles: {
-                        activeCss: "{feedback}.options.styles.activeCss"
+                        active: "{feedback}.options.styles.active"
                     },
                     selectors: {
                         icon: "{feedback}.options.selectors.matchConfirmationIcon"
@@ -66,13 +67,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             bindMismatchDetails: {
                 type: "gpii.metadata.feedback.bindMismatchDetails",
                 container: "{feedback}.dom.mismatchDetailsButton",
-                createOnEvent: "onFeedbackMarkupReady",
+                createOnEvent: "onPrepReady",
                 options: {
+                    dialogContainer: "{feedback}.dialogContainer",
                     strings: {
                         buttonLabel: "{feedback}.options.strings.mismatchDetailsLabel"
                     },
                     styles: {
-                        activeCss: "{feedback}.options.styles.activeCss"
+                        active: "{feedback}.options.styles.active"
                     },
                     selectors: {
                         icon: "{feedback}.options.selectors.mismatchDetailsIcon"
@@ -89,6 +91,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                             listener: "{feedback}.events.afterMismatchDetailsButtonClicked.fire",
                             priority: "last"
                         }
+                    },
+                    invokers: {
+                        closeDialog: "{feedback}.closeDialog"
                     },
                     renderDialogContentOptions: {
                         model: {
@@ -117,7 +122,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             tooltip: {
                 type: "gpii.metadata.feedback.tooltip",
                 container: "{feedback}.container",
-                createOnEvent: "onFeedbackMarkupReady",
+                createOnEvent: "onPrepReady",
                 options: {
                     styles: {
                         openIndicator: "{feedback}.options.styles.openIndicator"
@@ -130,6 +135,13 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         "mismatchDetailsIcon": {
                             label: "mismatchDetailsLabel",
                             selectorForIndicatorStyle: "mismatchDetailsButton"
+                        }
+                    },
+                    listeners: {
+                        afterOpen: "{feedback}.events.afterTooltipOpen",
+                        afterClose: "{feedback}.events.afterTooltipClose",
+                        "afterClose.removeOpenIndicator": {
+                            listener: "fluid.identity"
                         }
                     },
                     selectors: "{feedback}.options.selectors",
@@ -151,7 +163,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         styles: {
             container: "gpii-feedback",
-            activeCss: "gpii-icon-active",
+            active: "gpii-icon-active",
             openIndicator: "gpii-icon-arrow"
         },
         selectors: {
@@ -164,7 +176,8 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             userData: {},
             inTransit: {
                 opinion: ["none"]   // Possible values: like, dislike, none
-            }
+            },
+            isDialogOpen: false
         },
         modelRelay: [{
             source: "{that}.model.inTransit.opinion",
@@ -180,13 +193,22 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         }],
         events: {
+            onDialogInited: null,
             onFeedbackMarkupReady: null,
+            onPrepReady: {
+                events: {
+                    onDialogInited: "onDialogInited",
+                    onFeedbackMarkupReady: "onFeedbackMarkupReady"
+                }
+            },
             afterMatchConfirmationButtonClicked: null,
             afterMismatchDetailsButtonClicked: null,
             onSkipAtMismatchDetails: null,
             onSubmitAtMismatchDetails: null,
             onSave: null,
-            afterSave: null
+            afterSave: null,
+            afterTooltipOpen: null,
+            afterTooltipClose: null
         },
         listeners: {
             "onCreate.addContainerClass": {
@@ -204,12 +226,32 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 "func": "{that}.events.onFeedbackMarkupReady",
                 "args": "{that}",
                 "priority": "last"
+            },
+            "afterDialogOpen.closeTooltip": {
+                "this": "{tooltip}",
+                method: "close"
+            },
+            "afterTooltipOpen.determineIfOpenTooltip": {
+                listener: "gpii.metadata.feedback.determineIfOpenTooltip",
+                args: ["{that}", "{tooltip}", "{arguments}.1"]
+            },
+            "afterTooltipOpen.removeOpenIndicatorFromDialog": {
+                listener: "gpii.metadata.feedback.removeOpenIndicatorFromDialog",
+                args: ["{that}", "{arguments}.1"]
+            },
+            "afterTooltipClose.removeOpenIndicator": {
+                listener: "gpii.metadata.feedback.removeOpenIndicatorForTooltip",
+                args: ["{that}", "{arguments}.1"]
             }
         },
         invokers: {
             save: {
                 funcName: "gpii.metadata.feedback.save",
                 args: ["{that}", "{dataSource}"]
+            },
+            isTooltipDialogShareSameTarget: {
+                funcName: "gpii.metadata.feedback.isTooltipDialogShareSameTarget",
+                args: ["{that}", "{arguments}.0"]
             }
         }
     });
@@ -227,6 +269,43 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             feedback.save();
         } else if (!partner.model.isActive) {
             feedback.applier.change("inTransit.opinion.0", "none");
+        }
+    };
+
+    gpii.metadata.feedback.isTooltipDialogShareSameTarget = function (that, tooltipTarget) {
+        var dialogOpener = that.getDialogOpener();
+        if (dialogOpener && $.contains(dialogOpener[0], tooltipTarget)) {
+            return true;
+        }
+        return false;
+    };
+
+    gpii.metadata.feedback.determineIfOpenTooltip = function (that, tooltip, tooltipTarget) {
+        // Prevent the tooltip from opening if the dialog for the source button already opens
+        if (that.model.isDialogOpen && that.isTooltipDialogShareSameTarget(tooltipTarget)) {
+            tooltip.close();
+        }
+    };
+
+    gpii.metadata.feedback.removeOpenIndicatorFromDialog = function (that, tooltipTarget) {
+        // Make sure only one open indicator is shown at a time. If hoving over a button opens
+        // a tooltip meanwhile a dialog is already open, remove the open indicator for the dialog
+        // so only show the indicator for the tooltip.
+        if (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget)) {
+            var dialogOpener = that.getDialogOpener();
+            dialogOpener.removeClass(that.options.styles.openIndicator);
+        }
+    };
+
+    gpii.metadata.feedback.removeOpenIndicatorForTooltip = function (that, tooltipTarget) {
+        if (!that.model.isDialogOpen || (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget))) {
+            var selectorForIndicatorStyle = that.tooltip.findElmForIndicatorStyle(tooltipTarget.id);
+            $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
+        }
+        // Place back the open indicator for the opened dialog
+        if (that.model.isDialogOpen) {
+            var dialogOpener = that.getDialogOpener();
+            dialogOpener.addClass(that.options.styles.openIndicator);
         }
     };
 
