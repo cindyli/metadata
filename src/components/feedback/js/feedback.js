@@ -241,7 +241,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             },
             "afterTooltipClose.removeOpenIndicator": {
                 listener: "gpii.metadata.feedback.removeOpenIndicatorForTooltip",
-                args: ["{that}", "{arguments}.1"]
+                args: ["{that}", "{arguments}.1", "{arguments}.3"]
             }
         },
         invokers: {
@@ -297,9 +297,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         }
     };
 
-    gpii.metadata.feedback.removeOpenIndicatorForTooltip = function (that, tooltipTarget) {
+    gpii.metadata.feedback.removeOpenIndicatorForTooltip = function (that, tooltipTarget, event) {
+        // don't remove the open indicator if the dialog for the same button is at open state
         if (!that.model.isDialogOpen || (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget))) {
-            var selectorForIndicatorStyle = that.tooltip.findElmForIndicatorStyle(tooltipTarget.id);
+            var selectorForIndicatorStyle = that.tooltip.findElmForIndicatorStyle(tooltipTarget.id, event);
             $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
         }
         // Place back the open indicator for the opened dialog
