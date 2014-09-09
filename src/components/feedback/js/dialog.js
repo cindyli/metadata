@@ -40,7 +40,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         modelListeners: {
             // passing in invokers directly to ensure they are resolved at the correct time.
             "isDialogOpen": {
-                listener: "gpii.metadata.feedback.handleDialogState",
+                listener: "gpii.metadata.feedback.dialog.handleDialogState",
                 args: ["{that}", "{change}.value", "{that}.closeDialog", "{that}.bindIframeClick", "{that}.unbindIframeClick"]
             }
         },
@@ -51,7 +51,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         listeners: {
             "onCreate.createDialog": {
-                listener: "gpii.metadata.feedback.createDialog",
+                listener: "gpii.metadata.feedback.dialog.createDialog",
                 args: ["{that}"]
             },
             "afterDialogOpen.addOpenIndicator": {
@@ -70,18 +70,18 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 args: ["close"]
             },
             bindIframeClick: {
-                funcName: "gpii.metadata.feedback.bindIframeClick",
+                funcName: "gpii.metadata.feedback.dialog.bindIframeClick",
                 args: ["{that}.closeDialog"]
             },
-            unbindIframeClick: "gpii.metadata.feedback.unbindIframeClick",
+            unbindIframeClick: "gpii.metadata.feedback.dialog.unbindIframeClick",
             getDialogOpener: {
-                funcName: "gpii.metadata.feedback.getDialogOpener",
+                funcName: "gpii.metadata.feedback.dialog.getDialogOpener",
                 args: ["{that}.dialogContainer"]
             }
         }
     });
 
-    gpii.metadata.feedback.createDialog = function (that) {
+    gpii.metadata.feedback.dialog.createDialog = function (that) {
         that.dialogContainer = $(that.options.markup.dialog).hide();
         that.container.append(that.dialogContainer);
 
@@ -102,7 +102,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         that.events.onDialogInited.fire(that.dialogContainer);
     };
 
-    gpii.metadata.feedback.handleDialogState = function (that, isDialogOpen, closeDialogFn, bindIframeClickFn, unbindIframeClickFn) {
+    gpii.metadata.feedback.dialog.handleDialogState = function (that, isDialogOpen, closeDialogFn, bindIframeClickFn, unbindIframeClickFn) {
         var dialog = that.dialog;
 
         if (isDialogOpen) {
@@ -121,23 +121,23 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         }
     };
 
-    gpii.metadata.feedback.getIframes = function () {
+    gpii.metadata.feedback.dialog.getIframes = function () {
         return $("body").find("iframe").contents().find("body");
     };
 
-    gpii.metadata.feedback.bindIframeClick = function (closeDialogFunc) {
-        var iframes = gpii.metadata.feedback.getIframes();
+    gpii.metadata.feedback.dialog.bindIframeClick = function (closeDialogFunc) {
+        var iframes = gpii.metadata.feedback.dialog.getIframes();
         iframes.on("click.closeDialog", function () {
             closeDialogFunc();
         });
     };
 
-    gpii.metadata.feedback.unbindIframeClick = function () {
-        var iframes = gpii.metadata.feedback.getIframes();
+    gpii.metadata.feedback.dialog.unbindIframeClick = function () {
+        var iframes = gpii.metadata.feedback.dialog.getIframes();
         iframes.off("click.closeDialog");
     };
 
-    gpii.metadata.feedback.getDialogOpener = function (dialogContainer) {
+    gpii.metadata.feedback.dialog.getDialogOpener = function (dialogContainer) {
         return dialogContainer.data("opener");
     };
 
