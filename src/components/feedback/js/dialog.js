@@ -55,12 +55,12 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 args: ["{that}"]
             },
             "afterDialogOpen.addOpenIndicator": {
-                listener: "gpii.metadata.feedback.dialog.addOpenIndicator",
-                args: ["{that}"]
+                listener: "gpii.metadata.feedback.dialog.handleOpenIndicator",
+                args: ["{that}", "addClass"]
             },
             "afterDialogClose.removeOpenIndicator": {
-                listener: "gpii.metadata.feedback.dialog.removeOpenIndicator",
-                args: ["{that}"]
+                listener: "gpii.metadata.feedback.dialog.handleOpenIndicator",
+                args: ["{that}", "removeClass"]
             }
         },
         invokers: {
@@ -77,6 +77,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             getDialogOpener: {
                 funcName: "gpii.metadata.feedback.dialog.getDialogOpener",
                 args: ["{that}.dialogContainer"]
+            },
+            setDialogOpener: {
+                funcName: "gpii.metadata.feedback.dialog.setDialogOpener",
+                args: ["{that}.dialog", "{arguments}.0"]
             }
         }
     });
@@ -141,12 +145,15 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         return dialogContainer.data("opener");
     };
 
-    gpii.metadata.feedback.dialog.addOpenIndicator = function (that) {
-        that.getDialogOpener().addClass(that.options.styles.openIndicator);
+    gpii.metadata.feedback.dialog.handleOpenIndicator = function (that, actionFunc) {
+        var opener = that.getDialogOpener();
+        if (opener) {
+            opener[actionFunc](that.options.styles.openIndicator);
+        }
     };
 
-    gpii.metadata.feedback.dialog.removeOpenIndicator = function (that) {
-        that.getDialogOpener().removeClass(that.options.styles.openIndicator);
+    gpii.metadata.feedback.dialog.setDialogOpener = function (dialog, openerContainer) {
+        dialog.data("opener", openerContainer);
     };
 
 })(jQuery, fluid);

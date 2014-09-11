@@ -61,6 +61,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                             listener: "{feedback}.events.afterMatchConfirmationButtonClicked.fire",
                             priority: "last"
                         }
+                    },
+                    invokers: {
+                        setDialogOpener: "{feedback}.setDialogOpener"
                     }
                 }
             },
@@ -93,7 +96,8 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         }
                     },
                     invokers: {
-                        closeDialog: "{feedback}.closeDialog"
+                        closeDialog: "{feedback}.closeDialog",
+                        setDialogOpener: "{feedback}.setDialogOpener"
                     },
                     renderDialogContentOptions: {
                         model: {

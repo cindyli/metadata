@@ -185,7 +185,7 @@ var gpii = gpii || {};
             },
             openDialog: {
                 funcName: "gpii.metadata.feedback.openDialog",
-                args: ["{that}.options.dialogContainer", "{that}.container"]
+                args: ["{that}"]
             },
             renderDialog: {
                 funcName: "gpii.metadata.feedback.renderDialog",
@@ -235,8 +235,9 @@ var gpii = gpii || {};
         that.events.onDialogReady.fire(that.dialog);
     };
 
-    gpii.metadata.feedback.openDialog = function (dialog, openerContainer) {
-        dialog.data("opener", openerContainer).dialog("open");
+    gpii.metadata.feedback.openDialog = function (that) {
+        that.setDialogOpener(that.container);
+        that.dialog.dialog("open");
     };
 
     gpii.metadata.feedback.handleActiveState = function (isActive, buttonDom, activeCss) {
