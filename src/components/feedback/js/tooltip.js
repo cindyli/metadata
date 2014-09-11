@@ -52,10 +52,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         },
         listeners: {
-            "onCreate.unbindESC": {
-                listener: "gpii.metadata.feedback.tooltip.unbindESC",
-                args: ["{that}.container"]
-            },
             "afterOpen.addOpenIndicator": "gpii.metadata.feedback.tooltip.addOpenIndicator({that}, {arguments}.1, {arguments}.3)",
             "afterClose.removeOpenIndicator": "gpii.metadata.feedback.tooltip.removeOpenIndicator({that}, {arguments}.1, {arguments}.3)"
         },
@@ -109,15 +105,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
     gpii.metadata.feedback.tooltip.removeOpenIndicator = function (that, target, event) {
         var selectorForIndicatorStyle = that.findElmForIndicatorStyle(target.id, event);
         $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
-    };
-
-    gpii.metadata.feedback.tooltip.unbindESC = function (elm) {
-        var elms = elm.contents().addBack(); // self plus decendants
-        elms.keyup(function (e) {
-            if (e.keyCode === $.ui.keyCode.ESCAPE) {
-                e.stopImmediatePropagation();
-            }
-        });
     };
 
 })(jQuery, fluid);

@@ -74,6 +74,11 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 args: ["{that}.closeDialog"]
             },
             unbindIframeClick: "gpii.metadata.feedback.dialog.unbindIframeClick",
+            getDialogId: {
+                "this": "{that}.dialog",
+                method: "attr",
+                args: ["id"]
+            },
             getDialogOpener: {
                 funcName: "gpii.metadata.feedback.dialog.getDialogOpener",
                 args: ["{that}.dialogContainer"]

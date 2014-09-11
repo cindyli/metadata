@@ -16,6 +16,7 @@ https://github.com/gpii/universal/LICENSE.txt
     gpii.tests.dialog.assertInit = function (that) {
         jqUnit.assertNotNull("The dialog container has been created", that.dialogContainer);
         jqUnit.assertNotNull("The dialog has been created", that.dialog);
+        jqUnit.assertEquals("getDialogId() returns the id of the created dialog", that.dialog.attr("id"), that.getDialogId());
     };
 
     gpii.tests.dialog.controlDialog = function (dialogContainer, action) {
@@ -52,7 +53,7 @@ https://github.com/gpii/universal/LICENSE.txt
             name: "Initialization",
             tests: [{
                 name: "onCreate creates the dialog container and the dialog",
-                expect: 2,
+                expect: 3,
                 sequence: [{
                     listener: "gpii.tests.dialog.assertInit",
                     args: ["{dialog}"],

@@ -39,12 +39,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 container: "{feedback}.dom.matchConfirmationButton",
                 createOnEvent: "onPrepReady",
                 options: {
-                    dialogContainer: "{feedback}.dialogContainer",
+                    gradeNames: ["gpii.metadata.feedback.buttonConfig"],
                     strings: {
                         buttonLabel: "{feedback}.options.strings.matchConfirmationLabel"
-                    },
-                    styles: {
-                        active: "{feedback}.options.styles.active"
                     },
                     selectors: {
                         icon: "{feedback}.options.selectors.matchConfirmationIcon"
@@ -61,9 +58,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                             listener: "{feedback}.events.afterMatchConfirmationButtonClicked.fire",
                             priority: "last"
                         }
-                    },
-                    invokers: {
-                        setDialogOpener: "{feedback}.setDialogOpener"
                     }
                 }
             },
@@ -72,12 +66,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 container: "{feedback}.dom.mismatchDetailsButton",
                 createOnEvent: "onPrepReady",
                 options: {
-                    dialogContainer: "{feedback}.dialogContainer",
+                    gradeNames: ["gpii.metadata.feedback.buttonConfig"],
                     strings: {
                         buttonLabel: "{feedback}.options.strings.mismatchDetailsLabel"
-                    },
-                    styles: {
-                        active: "{feedback}.options.styles.active"
                     },
                     selectors: {
                         icon: "{feedback}.options.selectors.mismatchDetailsIcon"
@@ -96,8 +87,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         }
                     },
                     invokers: {
-                        closeDialog: "{feedback}.closeDialog",
-                        setDialogOpener: "{feedback}.setDialogOpener"
+                        closeDialog: "{feedback}.closeDialog"
                     },
                     renderDialogContentOptions: {
                         model: {
@@ -326,5 +316,28 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             that.events.afterSave.fire(dataToSave);
         });
     };
+
+
+    /*
+     * Defines common configs shared by all feedback buttons for linking up with the parent feedback component
+     */
+
+    fluid.defaults("gpii.metadata.feedback.buttonConfig", {
+        gradeNames: ["fluid.standardRelayComponent", "autoInit"],
+        dialogContainer: "{feedback}.dialogContainer",
+        styles: {
+            active: "{feedback}.options.styles.active"
+        },
+        listeners: {
+            "onCreate.addAriaControls": {
+                "this": "{that}.container",
+                method: "attr",
+                args: ["aria-controls", "{feedback}.getDialogId"]
+            }
+        },
+        invokers: {
+            setDialogOpener: "{feedback}.setDialogOpener"
+        }
+    });
 
 })(jQuery, fluid);
