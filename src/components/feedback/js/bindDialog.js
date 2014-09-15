@@ -117,10 +117,12 @@ var gpii = gpii || {};
             focus: "gpii-feedback-buttonFocus",
             hover: "gpii-feedback-buttonHover"
         },
-        dialogPosition: {
-            my: "center top",
-            at: "center-10% bottom+42%",
-            of: "{that}.container"
+        dialogOptions: {
+            position: {
+                my: "center top",
+                at: "center-10% bottom+42%",
+                of: "{that}.container"
+            }
         },
         events: {
             onRenderDialogContent: null,
@@ -171,7 +173,7 @@ var gpii = gpii || {};
         modelListeners: {
             "isActive": [
                 "gpii.metadata.feedback.handleActiveState({change}.value, {that}.container, {that}.options.styles.active)",
-                "gpii.metadata.feedback.controlDialogState({change}.value, {that})"
+                "gpii.metadata.feedback.renderDialog({change}.value, {that})"
             ]
         },
         invokers: {
@@ -187,9 +189,10 @@ var gpii = gpii || {};
                 funcName: "gpii.metadata.feedback.openDialog",
                 args: ["{that}"]
             },
-            renderDialog: {
-                funcName: "gpii.metadata.feedback.renderDialog",
-                args: ["{that}"]
+            setDialogOpener: {
+                "this": "{that}.dialog",
+                method: "data",
+                args: ["opener", "{that}.container"]
             }
         },
         distributeOptions: [{
@@ -224,19 +227,19 @@ var gpii = gpii || {};
         });
     };
 
-    gpii.metadata.feedback.controlDialogState = function (isActive, that) {
+    gpii.metadata.feedback.renderDialog = function (isActive, that) {
         if (isActive) {
             that.events.onRenderDialogContent.fire();
         }
     };
 
     gpii.metadata.feedback.positionDialog = function (that) {
-        that.dialog = that.options.dialogContainer.dialog("option", "position", that.options.dialogPosition);
+        that.dialog = that.options.dialogContainer.dialog("option", that.options.dialogOptions);
         that.events.onDialogReady.fire(that.dialog);
     };
 
     gpii.metadata.feedback.openDialog = function (that) {
-        that.setDialogOpener(that.container);
+        that.setDialogOpener();
         that.dialog.dialog("open");
     };
 

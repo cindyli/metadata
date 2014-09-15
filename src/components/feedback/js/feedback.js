@@ -334,9 +334,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 method: "attr",
                 args: ["aria-controls", "{feedback}.getDialogId"]
             }
-        },
-        invokers: {
-            setDialogOpener: "{feedback}.setDialogOpener"
         }
     });
 

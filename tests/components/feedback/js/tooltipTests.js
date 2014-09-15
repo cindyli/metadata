@@ -43,7 +43,7 @@ https://github.com/gpii/universal/LICENSE.txt
                         button1: ".gpiic-button1",
                         icon1: "#gpiic-icon1",
                         button2: ".gpiic-button2",
-                        icon2: "#gpiic-icon2",
+                        icon2: "#gpiic-icon2"
                     },
                     selectorsMap: {
                         icon1: {
