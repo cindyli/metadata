@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Feedback tooltip tests</title>
+
+        <link rel="stylesheet" media="screen" href="../../../lib/infusion/lib/qunit/css/qunit.css" />
+
+        <script src="../../../../src/lib/infusion/infusion-custom.js"></script>
+        <script src="../../../lib/infusion/lib/qunit/js/qunit.js"></script>
+        <script src="../../../lib/infusion/test-core/jqUnit/js/jqUnit.js"></script>
+        <script src="../../../lib/infusion/test-core/jqUnit/js/jqUnit-browser.js"></script>
+        <script src="../../../lib/infusion/test-core/utils/js/IoCTestUtils.js"></script>
+
+        <script src="../../../../src/components/feedback/js/tooltip.js"></script>
+        <script src="../js/tooltipTests.js"></script>
+    </head>
+
+    <body id="body">
+        <h1 id="qunit-header">Feedback tooltip tests</h1>
+        <h2 id="qunit-banner"></h2>
+        <div id="qunit-testrunner-toolbar"></div>
+        <h2 id="qunit-userAgent"></h2>
+        <ol id="qunit-tests"></ol>
+
+        <!-- Test HTML -->
+        <div id="tooltip-fixture">
+            <div class="gpiic-tooltip">
+            <!-- <div class="gpiic-tooltip" style="display:none;"> -->
+                <div class="gpiic-button1">
+                    <a id="gpiic-icon1" href="#">tooltip anchor 1</a>
+                </div>
+                <div class="gpiic-button2">
+                    <a id="gpiic-icon2" href="#">tooltip anchor 2</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

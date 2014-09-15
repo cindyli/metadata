@@ -52,8 +52,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         },
         listeners: {
-            "afterOpen.addOpenIndicator": "gpii.metadata.feedback.tooltip.addOpenIndicator({that}, {arguments}.1, {arguments}.3)",
-            "afterClose.removeOpenIndicator": "gpii.metadata.feedback.tooltip.removeOpenIndicator({that}, {arguments}.1, {arguments}.3)"
+            "afterOpen.addOpenIndicator": {
+                listener: "gpii.metadata.feedback.tooltip.handleOpenIndicator",
+                args: ["{that}", "{arguments}.1", "{arguments}.3", "addClass"]
+            },
+            "afterClose.removeOpenIndicator": {
+                listener: "gpii.metadata.feedback.tooltip.handleOpenIndicator",
+                args: ["{that}", "{arguments}.1", "{arguments}.3", "removeClass"]
+            }
         },
         invokers: {
             matchElementInMap: {
@@ -97,14 +103,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         return elmForTargetId ? elmForTargetId : that.matchElementInMap(event.currentTarget.id);
     };
 
-    gpii.metadata.feedback.tooltip.addOpenIndicator = function (that, target, event) {
+    gpii.metadata.feedback.tooltip.handleOpenIndicator = function (that, target, event, actionFunc) {
         var selectorForIndicatorStyle = that.findElmForIndicatorStyle(target.id, event);
-        $(selectorForIndicatorStyle).addClass(that.options.styles.openIndicator);
-    };
-
-    gpii.metadata.feedback.tooltip.removeOpenIndicator = function (that, target, event) {
-        var selectorForIndicatorStyle = that.findElmForIndicatorStyle(target.id, event);
-        $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
+        $(selectorForIndicatorStyle)[actionFunc](that.options.styles.openIndicator);
     };
 
 })(jQuery, fluid);
