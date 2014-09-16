@@ -116,7 +116,7 @@ https://github.com/gpii/universal/LICENSE.txt
         jqUnit.assertTrue("Opening the tooltip adds the open indicator to the corresponding button", $(buttonSelector).hasClass(openIndicator));
     };
 
-    gpii.tests.assertTooltipClose = function (that) {
+    gpii.tests.assertTooltipClose = function () {
         jqUnit.assertTrue("Tooltip is closed with firing afterTooltipClose event", true);
     };
 
@@ -318,7 +318,7 @@ https://github.com/gpii/universal/LICENSE.txt
                     priority: "last",
                     event: "{feedback}.events.afterTooltipOpen"
                 }, {
-                    func: "{feedback}.tooltip.close",
+                    func: "{feedback}.tooltip.close"
                 }, {
                     listener: "gpii.tests.assertBoth",
                     args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.styles.openIndicator"],
