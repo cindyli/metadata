@@ -59,8 +59,11 @@ https://github.com/gpii/universal/LICENSE.txt
 
     gpii.tests.verifyInit = function (that) {
         jqUnit.assertNotNull("The subcomponent dataSource has been created", that.dataSource);
+        jqUnit.assertNotNull("The subcomponent tooltip has been created", that.tooltip);
         jqUnit.assertNotNull("The subcomponent matchConfirmation has been created", that.matchConfirmation);
         jqUnit.assertNotNull("The subcomponent mismatchDetails has been created", that.mismatchDetails);
+        jqUnit.assertNotNull("The dialog container has been created", that.dialogContainer);
+        jqUnit.assertNotNull("The dialog has been created", that.dialog);
 
         jqUnit.assertEquals("The aria role is set for match confirmation button", "button", that.locate("matchConfirmationButton").attr("role"));
         jqUnit.assertEquals("The aria label is set", that.options.strings.matchConfirmationLabel, that.locate("matchConfirmationButton").attr("aria-label"));
@@ -76,9 +79,9 @@ https://github.com/gpii/universal/LICENSE.txt
     gpii.tests.verifyDialog = function (feedback, dialogComponentName, expectedIsDialogOpen, expectedIsActive) {
         var dialogComponent = feedback[dialogComponentName];
 
-        jqUnit.assertNotNull("Button click triggers the creation of the dialog", dialogComponent.dialog);
-        jqUnit.assertEquals("The dialog is open", expectedIsDialogOpen, dialogComponent.model.isDialogOpen);
-        jqUnit.assertEquals("The state is active", expectedIsActive, dialogComponent.model.isActive);
+        jqUnit.assertEquals("The dialog is open", expectedIsDialogOpen, feedback.model.isDialogOpen);
+        jqUnit.assertEquals("The state of " + dialogComponentName + " is active", expectedIsActive, dialogComponent.model.isActive);
+        jqUnit.assertEquals("The aria-controls has been set properly", feedback.getDialogId(), dialogComponent.container.attr("aria-controls"));
     };
 
     gpii.tests.clickMismatchDetailsLinks = function (feedback, linkSelector) {
@@ -117,7 +120,7 @@ https://github.com/gpii/universal/LICENSE.txt
             name: "Initialization",
             tests: [{
                 name: "Init",
-                expect: 6,
+                expect: 9,
                 sequence: [{
                     listener: "gpii.tests.verifyInit",
                     args: ["{feedback}"],
