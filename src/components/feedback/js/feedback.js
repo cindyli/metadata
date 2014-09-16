@@ -275,14 +275,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
     };
 
     gpii.metadata.feedback.determineIfOpenTooltip = function (that, tooltip, tooltipTarget) {
-        // Prevent the tooltip from opening if the dialog for the source button already opens
+        // Prevent the tooltip from opening if the dialog for the source button is already open
         if (that.model.isDialogOpen && that.isTooltipDialogShareSameTarget(tooltipTarget)) {
             tooltip.close();
         }
     };
 
     gpii.metadata.feedback.removeOpenIndicatorFromDialog = function (that, tooltipTarget) {
-        // Make sure only one open indicator is shown at a time. If hoving over a button opens
+        // Make sure only one open indicator is shown at a time. If hovering over a button opens
         // a tooltip meanwhile a dialog is already open, remove the open indicator for the dialog
         // so only show the indicator for the tooltip.
         if (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget)) {

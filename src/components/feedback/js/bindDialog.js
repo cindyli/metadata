@@ -173,7 +173,7 @@ var gpii = gpii || {};
         modelListeners: {
             "isActive": [
                 "gpii.metadata.feedback.handleActiveState({change}.value, {that}.container, {that}.options.styles.active)",
-                "gpii.metadata.feedback.renderDialog({change}.value, {that})"
+                "gpii.metadata.feedback.renderDialog({that}, {change}.value)"
             ]
         },
         invokers: {
@@ -227,7 +227,7 @@ var gpii = gpii || {};
         });
     };
 
-    gpii.metadata.feedback.renderDialog = function (isActive, that) {
+    gpii.metadata.feedback.renderDialog = function (that, isActive) {
         if (isActive) {
             that.events.onRenderDialogContent.fire();
         }
