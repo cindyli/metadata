@@ -104,7 +104,7 @@ https://github.com/gpii/universal/LICENSE.txt
         mismatchDetailsComponent.locate("audio").click();
         mismatchDetailsComponent.locate("audioDesc").click();
         mismatchDetailsComponent.locate("other").click();
-        mismatchDetailsComponent.locate("otherFeedback").text(newText).change();
+        mismatchDetailsComponent.locate("otherFeedback").val(newText).change();
     };
 
     gpii.tests.verifyDialogOnSubmit = function (feedback) {
