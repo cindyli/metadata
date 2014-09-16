@@ -18,6 +18,7 @@ https://github.com/gpii/universal/LICENSE.txt
 
     fluid.defaults("gpii.tests.feedbackTests", {
         gradeNames: ["fluid.test.testEnvironment", "autoInit"],
+        markupFixture: "#feedback-fixture",
         components: {
             feedback: {
                 type: "gpii.metadata.feedback",
@@ -111,6 +112,19 @@ https://github.com/gpii/universal/LICENSE.txt
         jqUnit.assertFalse("The dialog is closed", bindMismatchDetails.model.isDialogOpen);
     };
 
+    gpii.tests.assertOpenIndicator = function (buttonSelector, openIndicator) {
+        jqUnit.assertTrue("Opening the tooltip adds the open indicator to the corresponding button", $(buttonSelector).hasClass(openIndicator));
+    };
+
+    gpii.tests.assertTooltipClose = function (that) {
+        jqUnit.assertTrue("Tooltip is closed with firing afterTooltipClose event", true);
+    };
+
+    gpii.tests.assertBoth = function (trueButton, falseButton, openIndicator) {
+        jqUnit.assertTrue("The open indicator has been applied", $(trueButton).hasClass(openIndicator));
+        jqUnit.assertFalse("The open indicator has been removed", $(falseButton).hasClass(openIndicator));
+    };
+
     fluid.defaults("gpii.tests.feedbackTester", {
         gradeNames: ["fluid.test.testCaseHolder", "autoInit"],
         testOptions: {
@@ -127,7 +141,10 @@ https://github.com/gpii/universal/LICENSE.txt
                     priority: "last",
                     event: "{feedbackTests feedback}.events.onFeedbackMarkupReady"
                 }]
-            }, {
+            }]
+        }, {
+            name: "Dialogs",
+            tests: [{
                 name: "Match confirmation dialog",
                 expect: 5,
                 sequence: [{
@@ -264,6 +281,49 @@ https://github.com/gpii/universal/LICENSE.txt
                 }, {
                     jQueryTrigger: "click",
                     element: "{feedback}.dom.matchConfirmationButton"
+                }]
+            }]
+        }, {
+            name: "Dialog & tooltiop interaction",
+            tests: [{
+                name: "Interaction between the dialog and the tooltip",
+                expect: 7,
+                sequence: [{
+                    element: "{feedback}.dom.matchConfirmationIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertOpenIndicator",
+                    args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
+                    priority: "last",
+                    event: "{feedback}.events.afterTooltipOpen"
+                }, {
+                    jQueryTrigger: "click",
+                    element: "{feedback}.dom.matchConfirmationButton"
+                }, {
+                    listener: "gpii.tests.assertTooltipClose",
+                    args: ["{feedback}"],
+                    priority: "last",
+                    event: "{feedback}.events.afterTooltipClose"
+                }, {
+                    listener: "gpii.tests.assertOpenIndicator",
+                    args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
+                    priority: "last",
+                    event: "{feedback}.events.afterDialogOpen"
+                }, {
+                    element: "{feedback}.dom.mismatchDetailsIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertBoth",
+                    args: ["{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
+                    priority: "last",
+                    event: "{feedback}.events.afterTooltipOpen"
+                }, {
+                    func: "{feedback}.tooltip.close",
+                }, {
+                    listener: "gpii.tests.assertBoth",
+                    args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.styles.openIndicator"],
+                    priority: "last",
+                    event: "{feedback}.events.afterTooltipClose"
                 }]
             }]
         }]

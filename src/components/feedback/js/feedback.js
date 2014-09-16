@@ -132,8 +132,8 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         }
                     },
                     listeners: {
-                        afterOpen: "{feedback}.events.afterTooltipOpen",
-                        afterClose: "{feedback}.events.afterTooltipClose",
+                        "afterOpen.escalateToParent": "{feedback}.events.afterTooltipOpen",
+                        "afterClose.escalateToParent": "{feedback}.events.afterTooltipClose",
                         "afterClose.removeOpenIndicator": {
                             listener: "fluid.identity"
                         }

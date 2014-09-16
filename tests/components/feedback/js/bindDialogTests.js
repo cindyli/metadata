@@ -40,7 +40,8 @@ https://github.com/gpii/universal/LICENSE.txt
 
         gpii.tests.bindDialog.onDialogReadyChecker = function (that, dialog) {
             var dialogOptions = dialog.dialog("option");
-            jqUnit.assertDeepEq("The dialog position option should be set", that.options.dialogOptions.position, dialogOptions.position);
+            jqUnit.assertNotNull("The event is fired with the proper argument", dialog);
+            jqUnit.assertNotNull("The dialog position has been set", dialogOptions.position);
             jqUnit.assertTrue("The dialog should be open", dialog.dialog("isOpen"));
         };
 
@@ -123,7 +124,7 @@ https://github.com/gpii/universal/LICENSE.txt
                 name: "Dialog State Changes",
                 tests: [{
                     name: "Mouse Interaction",
-                    expect: 9,
+                    expect: 10,
                     sequence: [{
                         jQueryTrigger: "click",
                         element: "{bindDialog}.container"
@@ -155,7 +156,7 @@ https://github.com/gpii/universal/LICENSE.txt
                     }]
                 }, {
                     name: "Keyboard Interaction",
-                    expect: 10,
+                    expect: 11,
                     sequence: [{
                         func: "gpii.tests.bindDialog.simulateKeyEvent",
                         args: ["{bindDialog}.container", "keydown", $.ui.keyCode.ENTER]
