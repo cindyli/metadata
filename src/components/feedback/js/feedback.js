@@ -131,12 +131,15 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                             selectorForIndicatorStyle: "mismatchDetailsButton"
                         }
                     },
-                    listeners: {
-                        "afterOpen.escalateToParent": "{feedback}.events.afterTooltipOpen",
-                        "afterClose.escalateToParent": "{feedback}.events.afterTooltipClose",
-                        "afterClose.removeOpenIndicator": {
-                            listener: "fluid.identity"
-                        }
+                    modelListeners: {
+                        isTooltipOpen: [{
+                            // TO-DO: to be replaced by model relay once fluid.tooltip becomes a relay component
+                            listener: "{feedback}.applier.change",
+                            args: ["isTooltipOpen", "{change}.value"]
+                        }, {
+                            listener: "fluid.identity",
+                            namespace: "handleOpenIndicator"
+                        }]
                     },
                     selectors: "{feedback}.options.selectors",
                     strings: "{feedback}.options.strings"
@@ -171,7 +174,15 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             inTransit: {
                 opinion: ["none"]   // Possible values: like, dislike, none
             },
-            isDialogOpen: false
+            isDialogOpen: false,
+            isTooltipOpen: false
+        },
+        modelListeners: {
+            isTooltipOpen: {
+                listener: "gpii.metadata.feedback.tooltipDialogInteraction",
+                args: ["{that}", "{change}.value"],
+                excludeSource: "init"
+            }
         },
         modelRelay: [{
             source: "{that}.model.inTransit.opinion",
@@ -200,9 +211,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             onSkipAtMismatchDetails: null,
             onSubmitAtMismatchDetails: null,
             onSave: null,
-            afterSave: null,
-            afterTooltipOpen: null,
-            afterTooltipClose: null
+            afterSave: null
         },
         listeners: {
             "onCreate.addContainerClass": {
@@ -224,18 +233,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             "afterDialogOpen.closeTooltip": {
                 "this": "{tooltip}",
                 method: "close"
-            },
-            "afterTooltipOpen.determineIfOpenTooltip": {
-                listener: "gpii.metadata.feedback.determineIfOpenTooltip",
-                args: ["{that}", "{tooltip}", "{arguments}.1"]
-            },
-            "afterTooltipOpen.removeOpenIndicatorFromDialog": {
-                listener: "gpii.metadata.feedback.removeOpenIndicatorFromDialog",
-                args: ["{that}", "{arguments}.1"]
-            },
-            "afterTooltipClose.removeOpenIndicator": {
-                listener: "gpii.metadata.feedback.removeOpenIndicatorForTooltip",
-                args: ["{that}", "{arguments}.1", "{arguments}.3"]
             }
         },
         invokers: {
@@ -243,9 +240,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 funcName: "gpii.metadata.feedback.save",
                 args: ["{that}", "{dataSource}"]
             },
-            isTooltipDialogShareSameTarget: {
-                funcName: "gpii.metadata.feedback.isTooltipDialogShareSameTarget",
-                args: ["{that}", "{arguments}.0"]
+            isShareTarget: {
+                funcName: "gpii.metadata.feedback.isShareTarget",
+                args: ["{that}"]
             }
         }
     });
@@ -266,40 +263,28 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         feedback.save();
     };
 
-    gpii.metadata.feedback.isTooltipDialogShareSameTarget = function (that, tooltipTarget) {
+    gpii.metadata.feedback.isShareTarget = function (that) {
         var dialogOpener = that.getDialogOpener();
-        if (dialogOpener && $.contains(dialogOpener[0], tooltipTarget)) {
+        if (dialogOpener && dialogOpener[0] === $(that.tooltip.tooltipOpener)[0]) {
             return true;
         }
         return false;
     };
 
-    gpii.metadata.feedback.determineIfOpenTooltip = function (that, tooltip, tooltipTarget) {
-        // Prevent the tooltip from opening if the dialog for the source button is already open
-        if (that.model.isDialogOpen && that.isTooltipDialogShareSameTarget(tooltipTarget)) {
-            tooltip.close();
-        }
-    };
+    gpii.metadata.feedback.tooltipDialogInteraction = function (that, isTooltipOpen) {
+        $(that.tooltip.tooltipOpener)[isTooltipOpen ? "addClass" : "removeClass"](that.options.styles.openIndicator);
 
-    gpii.metadata.feedback.removeOpenIndicatorFromDialog = function (that, tooltipTarget) {
-        // Make sure only one open indicator is shown at a time. If hovering over a button opens
-        // a tooltip meanwhile a dialog is already open, remove the open indicator for the dialog
-        // so only show the indicator for the tooltip.
-        if (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget)) {
-            var dialogOpener = that.getDialogOpener();
+        var dialogOpener = that.getDialogOpener();
+        var isShareTarget = that.isShareTarget();
+
+        if (isTooltipOpen && that.model.isDialogOpen && isShareTarget) {
+            // If both dialog and tooltip are open for the same button, close the tooltip
+            that.tooltip.close();
+        } else if (isTooltipOpen && that.model.isDialogOpen && !isShareTarget) {
+            // If both dialog and tooltip are open for different buttons, only show the arrow pointer for the tooltip
             dialogOpener.removeClass(that.options.styles.openIndicator);
-        }
-    };
-
-    gpii.metadata.feedback.removeOpenIndicatorForTooltip = function (that, tooltipTarget, event) {
-        // don't remove the open indicator if the dialog for the same button is at open state
-        if (!that.model.isDialogOpen || (that.model.isDialogOpen && !that.isTooltipDialogShareSameTarget(tooltipTarget))) {
-            var selectorForIndicatorStyle = that.tooltip.findElmForIndicatorStyle(tooltipTarget.id, event);
-            $(selectorForIndicatorStyle).removeClass(that.options.styles.openIndicator);
-        }
-        // Place back the open indicator for the opened dialog
-        if (that.model.isDialogOpen) {
-            var dialogOpener = that.getDialogOpener();
+        } else if (!isTooltipOpen && that.model.isDialogOpen) {
+            // When the tooltip is closed but the dialog for another button is still shown, add the arrow pointer back to the dialog
             dialogOpener.addClass(that.options.styles.openIndicator);
         }
     };
@@ -316,7 +301,6 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             that.events.afterSave.fire(dataToSave);
         });
     };
-
 
     /*
      * Defines common configs shared by all feedback buttons for linking up with the parent feedback component

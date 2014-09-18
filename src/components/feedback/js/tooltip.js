@@ -30,6 +30,13 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
      */
     fluid.defaults("gpii.metadata.feedback.tooltip", {
         gradeNames: ["fluid.tooltip", "autoInit"],
+        members: {
+            // Tooltips are attached with <a> links, while due to the styling restriction, the arrow pointer css needs to be applied
+            // (or removed) from outer button containers of <a> links. When a tooltip is closed or open, the corresponding button
+            // contain is looked up via this map for adding, or removing, the arrow pointer.
+            // idToOpener is the mapping between the <a> selectors and button selectors.
+            idToOpener: null
+        },
         styles: {
             tooltip: "gpii-feedback-tooltip",
             openIndicator: "gpii-icon-arrow"
@@ -44,68 +51,86 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         selectors: {},    // need to be supplied, contains selectors for icons and buttons
         strings: {},      // need to be supplied, contains strings for tooltip contents
         model: {
-            idToContent: {
-                expander: {
-                    funcName: "gpii.metadata.feedback.tooltip.buildToopTipIdToContent",
-                    args: ["{that}.options.selectors", "{that}.options.strings", "{that}.options.selectorsMap"]
-                }
-            }
+            idToContent: {},
+            isTooltipOpen: false
+        },
+        modelListeners: {
+            isTooltipOpen: [{
+                listener: "gpii.metadata.feedback.setTooltipOpener",
+                args: ["{that}", "{change}.value"]
+            }, {
+                listener: "{that}.handleOpenIndicator",
+                args: ["{change}.value"],
+                excludeSource: "init",
+                namespace: "handleOpenIndicator"
+            }]
         },
         listeners: {
-            "afterOpen.addOpenIndicator": {
-                listener: "gpii.metadata.feedback.tooltip.handleOpenIndicator",
-                args: ["{that}", "{arguments}.1", "{arguments}.3", "addClass"]
+            "onCreate.buildIdToContent": {
+                listener: "gpii.metadata.feedback.tooltip.initialBuilds",
+                args: ["{that}"],
+                priority: "first"
             },
-            "afterClose.removeOpenIndicator": {
-                listener: "gpii.metadata.feedback.tooltip.handleOpenIndicator",
-                args: ["{that}", "{arguments}.1", "{arguments}.3", "removeClass"]
+            "afterOpen.setModel": {
+                changePath: "isTooltipOpen",
+                value: true
+            },
+            "afterClose.setModel": {
+                changePath: "isTooltipOpen",
+                value: false
             }
         },
         invokers: {
-            matchElementInMap: {
-                funcName: "gpii.metadata.feedback.tooltip.matchElementInMap",
-                args: ["{arguments}.0", "{that}.options.selectorsMap", "{that}.options.selectors"]
+            getSelectorId: {
+                funcName: "gpii.metadata.feedback.tooltip.getSelectorId",
+                args: ["{that}", "{arguments}.0"]
             },
-            findElmForIndicatorStyle: {
-                funcName: "gpii.metadata.feedback.tooltip.findElmForIndicatorStyle",
-                args: ["{that}", "{arguments}.0", "{arguments}.1"]
+            findTooltipOpener: {
+                funcName: "gpii.metadata.feedback.tooltip.findTooltipOpener",
+                args: ["{that}"]
+            },
+            handleOpenIndicator: {
+                funcName: "gpii.metadata.feedback.tooltip.handleOpenIndicator",
+                args: ["{that}", "{arguments}.0"]
             }
         }
     });
 
-    gpii.metadata.feedback.tooltip.getSelectorName = function (selector) {
-        return selector.substring(1, selector.length);
+    gpii.metadata.feedback.tooltip.getSelectorId = function (that, selector) {
+        return fluid.allocateSimpleId(that.locate(selector));
     };
 
-    gpii.metadata.feedback.tooltip.buildToopTipIdToContent = function (selectors, strings, selectorsMap) {
+    gpii.metadata.feedback.tooltip.initialBuilds = function (that) {
         var idToContent = {};
-        fluid.each(selectorsMap, function (infoObject, selector) {
-            var selectorValue = selectors[selector];
-            var iconName = gpii.metadata.feedback.tooltip.getSelectorName(selectorValue);
-            if (iconName) {
-                fluid.set(idToContent, iconName, strings[infoObject.label]);
+        var idToOpener = {};
+
+        fluid.each(that.options.selectorsMap, function (infoObject, selector) {
+            var iconId = that.getSelectorId(selector);
+            if (iconId) {
+                fluid.set(idToContent, iconId, that.options.strings[infoObject.label]);
+                fluid.set(idToOpener, iconId, that.options.selectors[infoObject.selectorForIndicatorStyle]);
             }
         });
-        return idToContent;
+        that.idToOpener = idToOpener;
+        that.applier.change("idToContent", idToContent);
     };
 
-    gpii.metadata.feedback.tooltip.matchElementInMap = function (iconName, selectorsMap, selectors) {
-        return fluid.find(selectorsMap, function (infoObject, selector) {
-            var thisSelectorName = gpii.metadata.feedback.tooltip.getSelectorName(selectors[selector]);
-            if (thisSelectorName === iconName) {
-                return selectors[infoObject.selectorForIndicatorStyle];
-            }
-        }, undefined);
+    gpii.metadata.feedback.tooltip.findTooltipOpener = function (that) {
+        var tooltipOpener;
+        fluid.each(that.openIdMap, function (trueValue, id) {
+            tooltipOpener = that.idToOpener[id];
+        });
+        return tooltipOpener;
     };
 
-    gpii.metadata.feedback.tooltip.findElmForIndicatorStyle = function (that, targetId, event) {
-        var elmForTargetId = that.matchElementInMap(targetId);
-        return elmForTargetId ? elmForTargetId : that.matchElementInMap(event.currentTarget.id);
+    gpii.metadata.feedback.setTooltipOpener = function (that, isTooltipOpen) {
+        if (isTooltipOpen) {
+            that.tooltipOpener = that.findTooltipOpener();
+        }
     };
 
-    gpii.metadata.feedback.tooltip.handleOpenIndicator = function (that, target, event, actionFunc) {
-        var selectorForIndicatorStyle = that.findElmForIndicatorStyle(target.id, event);
-        $(selectorForIndicatorStyle)[actionFunc](that.options.styles.openIndicator);
+    gpii.metadata.feedback.tooltip.handleOpenIndicator = function (that, isTooltipOpen) {
+        $(that.tooltipOpener)[isTooltipOpen ? "addClass" : "removeClass"](that.options.styles.openIndicator);
     };
 
 })(jQuery, fluid);

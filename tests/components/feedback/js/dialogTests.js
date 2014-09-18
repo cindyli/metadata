@@ -30,7 +30,7 @@ https://github.com/gpii/universal/LICENSE.txt
     };
 
     gpii.tests.dialog.assertDialogOpenState = function (isDialogOpen, expected) {
-        jqUnit[expected ? "assertTrue" : "assertFalse"]("The open state of the dialog is expected", isDialogOpen);
+        jqUnit[expected ? "assertTrue" : "assertFalse"]("The open state of the dialog is " + expected, isDialogOpen);
     };
 
     fluid.defaults("gpii.tests.dialogTests", {

@@ -52,10 +52,8 @@ https://github.com/gpii/universal/LICENSE.txt
             };
         };
 
-        gpii.tests.bindDialog.makeDialogChecker = function (that, modelPath, expectedValue) {
-            return function () {
-                jqUnit.assertEquals("The model path '" + modelPath + "'' is updated correctly.", expectedValue, fluid.get(that.model, modelPath));
-            };
+        gpii.tests.bindDialog.verifyDialog = function (dialogContainer) {
+            jqUnit.assertFalse("The dialog should be closed", dialogContainer.dialog("isOpen"));
         };
 
         gpii.tests.bindDialog.eventChecker = function (eventName) {
@@ -66,16 +64,8 @@ https://github.com/gpii/universal/LICENSE.txt
             $(elm).simulate(eventType, {keyCode: keyCode});
         };
 
-        gpii.tests.bindDialog.instantiateDialog = function (that) {
-            var dialogOptions = {
-                open: function () {
-                    that.applier.change("isDialogOpen", true);
-                },
-                close: function () {
-                    that.applier.change("isDialogOpen", false);
-                }
-            };
-            that.options.dialogContainer.dialog(dialogOptions);
+        gpii.tests.bindDialog.instantiateDialog = function (dialogContainer) {
+            dialogContainer.dialog();
         };
 
         var dialogContainer = $(".gpiic-dialogContainer");
@@ -90,9 +80,10 @@ https://github.com/gpii/universal/LICENSE.txt
                     options: {
                         dialogContainer: dialogContainer,
                         listeners: {
+                            // bindDialog component is designed to work with an pre-defined jquery dialog using that.options.dialogContainer.
                             "onCreate.instantiateDialog": {
                                 func: "gpii.tests.bindDialog.instantiateDialog",
-                                args: ["{that}"]
+                                args: ["{that}.options.dialogContainer"]
                             }
                         }
                     }
@@ -176,10 +167,10 @@ https://github.com/gpii/universal/LICENSE.txt
                         func: "gpii.tests.bindDialog.simulateKeyEvent",
                         args: ["{bindDialog}.dialog", "keydown", $.ui.keyCode.ESCAPE]
                     }, {
-                        listenerMaker: "gpii.tests.bindDialog.makeDialogChecker",
-                        makerArgs: ["{bindDialog}", "isDialogOpen", false],
-                        spec: {path: "isDialogOpen", priority: "last"},
-                        changeEvent: "{bindDialog}.applier.modelChanged"
+                        listener: "gpii.tests.bindDialog.verifyDialog",
+                        args: ["{bindDialog}.options.dialogContainer"],
+                        priority: "last",
+                        event: "{bindDialog}.events.afterButtonClicked"
                     }, {
                         func: "gpii.tests.bindDialog.simulateKeyEvent",
                         args: ["{bindDialog}.container", "keydown", $.ui.keyCode.SPACE]

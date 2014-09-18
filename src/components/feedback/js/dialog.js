@@ -32,7 +32,9 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             minHeight: 0,
             resizable: false,
             width: 450,
-            dialogClass: "gpii-feedback-noClose gpii-feedback-dialog"
+            dialogClass: "gpii-feedback-noClose gpii-feedback-dialog",
+            open: "{that}.openHandler",
+            close: "{that}.closeHandler"
         },
         model: {
             isDialogOpen: false
@@ -64,6 +66,18 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         },
         invokers: {
+            openHandler: {
+                func: "{that}.relayDialogEvent",
+                args: [true, "afterDialogOpen", "{arguments}.0"]
+            },
+            closeHandler: {
+                func: "{that}.relayDialogEvent",
+                args: [false, "afterDialogClose", "{arguments}.0"]
+            },
+            relayDialogEvent: {
+                funcName: "gpii.metadata.feedback.dialog.relayDialogEvent",
+                args: ["{that}", "{arguments}.0", "{arguments}.1", "{arguments}.2"]
+            },
             closeDialog: {
                 "this": "{that}.dialog",
                 method: "dialog",
@@ -90,24 +104,16 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         }
     });
 
+    gpii.metadata.feedback.dialog.relayDialogEvent = function (that, isOpening, eventName, event) {
+        that.applier.change("isDialogOpen", isOpening);
+        that.events[eventName].fire(that, fluid.resolveEventTarget(event), event);
+    };
+
     gpii.metadata.feedback.dialog.createDialog = function (that) {
         that.dialogContainer = $(that.options.markup.dialog).hide();
         that.container.append(that.dialogContainer);
 
-        var moreOptions = {
-            open: function (event) {
-                that.applier.change("isDialogOpen", true);
-                that.events.afterDialogOpen.fire(that, fluid.resolveEventTarget(event), event);
-            },
-            close: function (event) {
-                that.applier.change("isDialogOpen", false);
-                that.events.afterDialogClose.fire(that, fluid.resolveEventTarget(event), event);
-            }
-        };
-
-        var fullOptions = $.extend(true, moreOptions, that.options.commonDialogOptions);
-
-        that.dialog = that.dialogContainer.dialog(fullOptions);
+        that.dialog = that.dialogContainer.dialog(that.options.commonDialogOptions);
         that.events.onDialogInited.fire(that.dialogContainer);
     };
 
@@ -150,10 +156,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         return dialogContainer.data("opener");
     };
 
-    gpii.metadata.feedback.dialog.handleOpenIndicator = function (that, actionFunc) {
+    gpii.metadata.feedback.dialog.handleOpenIndicator = function (that, actionFuncName) {
         var opener = that.getDialogOpener();
         if (opener) {
-            opener[actionFunc](that.options.styles.openIndicator);
+            opener[actionFuncName](that.options.styles.openIndicator);
         }
     };
 

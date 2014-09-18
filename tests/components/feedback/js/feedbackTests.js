@@ -112,17 +112,23 @@ https://github.com/gpii/universal/LICENSE.txt
         jqUnit.assertFalse("The dialog is closed", bindMismatchDetails.model.isDialogOpen);
     };
 
+    gpii.tests.makeIndicatorChecker = function (that, buttonSelector, expectedValue) {
+        return function () {
+            jqUnit[expectedValue ? "assertTrue" : "assertFalse"]("The model value for isTooltipOpen is set to " + expectedValue, that.model.isTooltipOpen);
+            jqUnit[expectedValue ? "assertTrue" : "assertFalse"]("Opening the tooltip adds the open indicator to the corresponding button", $(buttonSelector).hasClass(that.options.styles.openIndicator));
+        };
+    };
+
     gpii.tests.assertOpenIndicator = function (buttonSelector, openIndicator) {
         jqUnit.assertTrue("Opening the tooltip adds the open indicator to the corresponding button", $(buttonSelector).hasClass(openIndicator));
     };
 
-    gpii.tests.assertTooltipClose = function () {
-        jqUnit.assertTrue("Tooltip is closed with firing afterTooltipClose event", true);
-    };
-
-    gpii.tests.assertBoth = function (trueButton, falseButton, openIndicator) {
-        jqUnit.assertTrue("The open indicator has been applied", $(trueButton).hasClass(openIndicator));
-        jqUnit.assertFalse("The open indicator has been removed", $(falseButton).hasClass(openIndicator));
+    gpii.tests.makeButtonsChecker = function (that, trueButton, falseButton, expectedValue) {
+        return function () {
+            jqUnit[expectedValue ? "assertTrue" : "assertFalse"]("The model value for isTooltipOpen is set to " + expectedValue, that.model.isTooltipOpen);
+            jqUnit.assertTrue("The open indicator has been applied", $(trueButton).hasClass(that.options.styles.openIndicator));
+            jqUnit.assertFalse("The open indicator has been removed", $(falseButton).hasClass(that.options.styles.openIndicator));
+        };
     };
 
     fluid.defaults("gpii.tests.feedbackTester", {
@@ -313,23 +319,23 @@ https://github.com/gpii/universal/LICENSE.txt
             name: "Dialog & tooltiop interaction",
             tests: [{
                 name: "Interaction between the dialog and the tooltip",
-                expect: 7,
+                expect: 11,
                 sequence: [{
                     element: "{feedback}.dom.matchConfirmationIcon",
                     jQueryTrigger: "focus"
                 }, {
-                    listener: "gpii.tests.assertOpenIndicator",
-                    args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
-                    priority: "last",
-                    event: "{feedback}.events.afterTooltipOpen"
+                    listenerMaker: "gpii.tests.makeIndicatorChecker",
+                    makerArgs: ["{feedback}", "{feedback}.options.selectors.matchConfirmationButton", true],
+                    spec: {path: "isTooltipOpen", priority: "last"},
+                    changeEvent: "{feedback}.applier.modelChanged"
                 }, {
                     jQueryTrigger: "click",
                     element: "{feedback}.dom.matchConfirmationButton"
                 }, {
-                    listener: "gpii.tests.assertTooltipClose",
-                    args: ["{feedback}"],
-                    priority: "last",
-                    event: "{feedback}.events.afterTooltipClose"
+                    listenerMaker: "gpii.tests.makeIndicatorChecker",
+                    makerArgs: ["{feedback}", "{feedback}.options.selectors.matchConfirmationButton", false],
+                    spec: {path: "isTooltipOpen", priority: "last"},
+                    changeEvent: "{feedback}.applier.modelChanged"
                 }, {
                     listener: "gpii.tests.assertOpenIndicator",
                     args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
@@ -339,17 +345,17 @@ https://github.com/gpii/universal/LICENSE.txt
                     element: "{feedback}.dom.mismatchDetailsIcon",
                     jQueryTrigger: "focus"
                 }, {
-                    listener: "gpii.tests.assertBoth",
-                    args: ["{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.styles.openIndicator"],
-                    priority: "last",
-                    event: "{feedback}.events.afterTooltipOpen"
+                    listenerMaker: "gpii.tests.makeButtonsChecker",
+                    makerArgs: ["{feedback}", "{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.selectors.matchConfirmationButton", true],
+                    spec: {path: "isTooltipOpen", priority: "last"},
+                    changeEvent: "{feedback}.applier.modelChanged"
                 }, {
                     func: "{feedback}.tooltip.close"
                 }, {
-                    listener: "gpii.tests.assertBoth",
-                    args: ["{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.selectors.mismatchDetailsButton", "{feedback}.options.styles.openIndicator"],
-                    priority: "last",
-                    event: "{feedback}.events.afterTooltipClose"
+                    listenerMaker: "gpii.tests.makeButtonsChecker",
+                    makerArgs: ["{feedback}", "{feedback}.options.selectors.matchConfirmationButton", "{feedback}.options.selectors.mismatchDetailsButton", false],
+                    spec: {path: "isTooltipOpen", priority: "last"},
+                    changeEvent: "{feedback}.applier.modelChanged"
                 }]
             }]
         }]

@@ -18,7 +18,12 @@ https://github.com/gpii/universal/LICENSE.txt
             "gpiic-icon1": that.options.strings.button1Label,
             "gpiic-icon2": that.options.strings.button2Label
         };
-        jqUnit.assertDeepEq("The dialog container has been created", expectedIdToContent, that.model.idToContent);
+        var expectedIdToOpener = {
+            "gpiic-icon1": ".gpiic-button1",
+            "gpiic-icon2": ".gpiic-button2"
+        };
+        jqUnit.assertDeepEq("The model value for idToContent has been populated correctly", expectedIdToContent, that.model.idToContent);
+        jqUnit.assertDeepEq("The value of idToOpener has been populated correctly", expectedIdToOpener, that.idToOpener);
     };
 
     gpii.tests.tooltip.assertOpenIndicator = function (button1, expectedButton1State, button2, expectedButton2State, openIndicator) {
@@ -69,7 +74,7 @@ https://github.com/gpii/universal/LICENSE.txt
             name: "Initialization",
             tests: [{
                 name: "The idToContent option is expanded",
-                expect: 1,
+                expect: 2,
                 sequence: [{
                     listener: "gpii.tests.tooltip.assertInit",
                     args: ["{tooltip}"],
