@@ -57,12 +57,12 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 args: ["{that}"]
             },
             "afterDialogOpen.addOpenIndicator": {
-                listener: "gpii.metadata.feedback.dialog.handleOpenIndicator",
-                args: ["{that}", "addClass"]
+                listener: "{that}.handleOpenIndicator",
+                args: ["addClass"]
             },
             "afterDialogClose.removeOpenIndicator": {
-                listener: "gpii.metadata.feedback.dialog.handleOpenIndicator",
-                args: ["{that}", "removeClass"]
+                listener: "{that}.handleOpenIndicator",
+                args: ["removeClass"]
             }
         },
         invokers: {
@@ -100,6 +100,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             setDialogOpener: {
                 funcName: "gpii.metadata.feedback.dialog.setDialogOpener",
                 args: ["{that}.dialog", "{arguments}.0"]
+            },
+            handleOpenIndicator: {
+                funcName: "gpii.metadata.feedback.dialog.handleOpenIndicator",
+                args: ["{that}", "{arguments}.0"]
             }
         }
     });

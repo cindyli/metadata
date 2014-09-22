@@ -57,12 +57,12 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         modelListeners: {
             isTooltipOpen: [{
                 listener: "gpii.metadata.feedback.setTooltipOpener",
-                args: ["{that}", "{change}.value"]
+                args: ["{that}", "{change}.value"],
+                priority: "first"
             }, {
                 listener: "{that}.handleOpenIndicator",
                 args: ["{change}.value"],
-                excludeSource: "init",
-                namespace: "handleOpenIndicator"
+                excludeSource: "init"
             }]
         },
         listeners: {
