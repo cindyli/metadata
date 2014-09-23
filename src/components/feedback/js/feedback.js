@@ -190,26 +190,8 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         modelRelay: [{
             source: "{that}.model",
-            target: "inTransit.bothOpen",
-            forward: "liveOnly",
-            singleTransform: {
-                type: "fluid.transforms.condition",
-                condition: {
-                    transform: {
-                        type: "fluid.transforms.binaryOp",
-                        leftPath: "isTooltipOpen",
-                        rightPath: "isDialogOpen",
-                        operator: "&&"
-                    }
-                },
-                "true": true,
-                "false": false
-            }
-        }, {
-            source: "inTransit.bothOpen",
             target: "isShareTarget",
             forward: "liveOnly",
-            backward: "never",
             singleTransform: {
                 type: "fluid.transforms.free",
                 args: {
@@ -218,69 +200,40 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                 func: "gpii.metadata.feedback.isShareTarget"
             }
         }, {
-            source: "{that}.model",
             target: "closeTooltip",
             forward: "liveOnly",
             singleTransform: {
-                type: "fluid.transforms.condition",
-                condition: {
-                    transform: {
-                        type: "fluid.transforms.binaryOp",
-                        leftPath: "inTransit.bothOpen",
-                        rightPath: "isShareTarget",
-                        operator: "&&"
-                    }
+                type: "fluid.transforms.free",
+                args: {
+                    "isTooltipOpen": "{that}.model.isTooltipOpen",
+                    "isDialogOpen": "{that}.model.isDialogOpen",
+                    "isShareTarget": "{that}.model.isShareTarget"
                 },
-                "true": true,
-                "false": false
+                func: "gpii.metadata.feedback.getCloseTooltip"
             }
         }, {
-            source: "{that}.model",
             target: "removeDialogIndicator",
             forward: "liveOnly",
             singleTransform: {
-                type: "fluid.transforms.condition",
-                condition: {
-                    transform: {
-                        type: "fluid.transforms.binaryOp",
-                        left: {
-                            transform: {
-                                type: "fluid.transforms.condition",
-                                conditionPath: "isShareTarget",
-                                "true": false,
-                                "false":true
-                            }
-                        },
-                        rightPath: "inTransit.bothOpen",
-                        operator: "&&"
-                    }
+                type: "fluid.transforms.free",
+                args: {
+                    "isTooltipOpen": "{that}.model.isTooltipOpen",
+                    "isDialogOpen": "{that}.model.isDialogOpen",
+                    "isShareTarget": "{that}.model.isShareTarget"
                 },
-                "true": true,
-                "false": false
+                func: "gpii.metadata.feedback.getRemoveDialogIndicator"
             }
         }, {
             source: "{that}.model",
             target: "addDialogIndicator",
             forward: "liveOnly",
             singleTransform: {
-                type: "fluid.transforms.condition",
-                condition: {
-                    transform: {
-                        type: "fluid.transforms.binaryOp",
-                        left: {
-                            transform: {
-                                type: "fluid.transforms.condition",
-                                conditionPath: "isTooltipOpen",
-                                "true": false,
-                                "false":true
-                            }
-                        },
-                        rightPath: "isDialogOpen",
-                        operator: "&&"
-                    }
+                type: "fluid.transforms.free",
+                args: {
+                    "isTooltipOpen": "{that}.model.isTooltipOpen",
+                    "isDialogOpen": "{that}.model.isDialogOpen"
                 },
-                "true": true,
-                "false": false
+                func: "gpii.metadata.feedback.getAddDialogIndicator"
             }
         }, {
             source: "{that}.model.inTransit.opinion",
@@ -364,6 +317,18 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             return true;
         }
         return false;
+    };
+
+    gpii.metadata.feedback.getCloseTooltip = function (model) {
+        return model.isTooltipOpen && model.isDialogOpen && model.isShareTarget;
+    };
+
+    gpii.metadata.feedback.getRemoveDialogIndicator = function (model) {
+        return model.isTooltipOpen && model.isDialogOpen && !model.isShareTarget;
+    };
+
+    gpii.metadata.feedback.getAddDialogIndicator = function (model) {
+        return !model.isTooltipOpen && model.isDialogOpen;
     };
 
     gpii.metadata.feedback.closeTooltip = function (tooltip, closeTooltip) {
