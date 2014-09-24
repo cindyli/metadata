@@ -131,12 +131,21 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                             selectorForIndicatorStyle: "mismatchDetailsButton"
                         }
                     },
+                    listeners: {
+                        afterOpen: {
+                            listener: "{that}.handleOpenIndicator",
+                            args: [true]
+                        }
+                    },
                     modelListeners: {
-                        isTooltipOpen: {
+                        isTooltipOpen: [{
                             // TO-DO: to be replaced by model relay once fluid.tooltip becomes a relay component
                             listener: "{feedback}.applier.change",
                             args: ["isTooltipOpen", "{change}.value"]
-                        }
+                        }, {
+                            listener: "fluid.identity",
+                            namespace: "handleOpenIndicator"
+                        }]
                     },
                     selectors: "{feedback}.options.selectors",
                     strings: "{feedback}.options.strings"
@@ -186,6 +195,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             addDialogIndicator: {
                 listener: "gpii.metadata.feedback.handleDialogIndicator",
                 args: ["{that}", "{change}.value", "addClass"]
+            },
+            removeTooltipIndicator: {
+                listener: "gpii.metadata.feedback.removeTooltipIndicator",
+                args: ["{that}", "{change}.value"]
             }
         },
         modelRelay: [{
@@ -234,6 +247,19 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                     "isDialogOpen": "{that}.model.isDialogOpen"
                 },
                 func: "gpii.metadata.feedback.getAddDialogIndicator"
+            }
+        }, {
+            source: "{that}.model",
+            target: "removeTooltipIndicator",
+            forward: "liveOnly",
+            singleTransform: {
+                type: "fluid.transforms.free",
+                args: {
+                    "isTooltipOpen": "{that}.model.isTooltipOpen",
+                    "isDialogOpen": "{that}.model.isDialogOpen",
+                    "isShareTarget": "{that}.model.isShareTarget"
+                },
+                func: "gpii.metadata.feedback.getRemoveTooltipIndicator"
             }
         }, {
             source: "{that}.model.inTransit.opinion",
@@ -331,6 +357,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         return !model.isTooltipOpen && model.isDialogOpen;
     };
 
+    gpii.metadata.feedback.getRemoveTooltipIndicator = function (model) {
+        return !model.isTooltipOpen && (!model.isDialogOpen || model.isDialogOpen && !model.isShareTarget);
+    };
+
     gpii.metadata.feedback.closeTooltip = function (tooltip, closeTooltip) {
         if (closeTooltip) {
             tooltip.close();
@@ -340,6 +370,13 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
     gpii.metadata.feedback.handleDialogIndicator = function (that, isPerformAction, actionFunc) {
         if (isPerformAction) {
             that.handleOpenIndicator(actionFunc);
+        }
+    };
+
+    gpii.metadata.feedback.removeTooltipIndicator = function (that, isPerformAction) {
+        if (isPerformAction) {
+            var tooltipOpener = that.tooltip.tooltipOpener;
+            $(tooltipOpener).removeClass(that.options.styles.openIndicator);
         }
     };
 
