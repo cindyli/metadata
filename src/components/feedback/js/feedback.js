@@ -132,7 +132,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         }
                     },
                     listeners: {
-                        afterOpen: {
+                        "afterOpen.handleOpenIndicator": {
                             listener: "{that}.handleOpenIndicator",
                             args: [true]
                         }
@@ -203,63 +203,15 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         modelRelay: [{
             source: "{that}.model",
-            target: "isShareTarget",
+            target: "{that}.model",
             forward: "liveOnly",
             singleTransform: {
                 type: "fluid.transforms.free",
                 args: {
-                    "that": "{that}"
+                    "model": "{that}.model",
+                    "isShareTargetFunc": "{that}.isShareTarget"
                 },
-                func: "gpii.metadata.feedback.isShareTarget"
-            }
-        }, {
-            target: "closeTooltip",
-            forward: "liveOnly",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                args: {
-                    "isTooltipOpen": "{that}.model.isTooltipOpen",
-                    "isDialogOpen": "{that}.model.isDialogOpen",
-                    "isShareTarget": "{that}.model.isShareTarget"
-                },
-                func: "gpii.metadata.feedback.getCloseTooltip"
-            }
-        }, {
-            target: "removeDialogIndicator",
-            forward: "liveOnly",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                args: {
-                    "isTooltipOpen": "{that}.model.isTooltipOpen",
-                    "isDialogOpen": "{that}.model.isDialogOpen",
-                    "isShareTarget": "{that}.model.isShareTarget"
-                },
-                func: "gpii.metadata.feedback.getRemoveDialogIndicator"
-            }
-        }, {
-            source: "{that}.model",
-            target: "addDialogIndicator",
-            forward: "liveOnly",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                args: {
-                    "isTooltipOpen": "{that}.model.isTooltipOpen",
-                    "isDialogOpen": "{that}.model.isDialogOpen"
-                },
-                func: "gpii.metadata.feedback.getAddDialogIndicator"
-            }
-        }, {
-            source: "{that}.model",
-            target: "removeTooltipIndicator",
-            forward: "liveOnly",
-            singleTransform: {
-                type: "fluid.transforms.free",
-                args: {
-                    "isTooltipOpen": "{that}.model.isTooltipOpen",
-                    "isDialogOpen": "{that}.model.isDialogOpen",
-                    "isShareTarget": "{that}.model.isShareTarget"
-                },
-                func: "gpii.metadata.feedback.getRemoveTooltipIndicator"
+                func: "gpii.metadata.feedback.computeStates"
             }
         }, {
             source: "{that}.model.inTransit.opinion",
@@ -313,6 +265,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             }
         },
         invokers: {
+            isShareTarget: {
+                funcName: "gpii.metadata.feedback.isShareTarget",
+                args: ["{that}"]
+            },
             save: {
                 funcName: "gpii.metadata.feedback.save",
                 args: ["{that}", "{dataSource}"]
@@ -336,8 +292,7 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         feedback.save();
     };
 
-    gpii.metadata.feedback.isShareTarget = function (model) {
-        var that = model.that;
+    gpii.metadata.feedback.isShareTarget = function (that) {
         var dialogOpener = that.getDialogOpener();
         if (dialogOpener && dialogOpener[0] === $(that.tooltip.tooltipOpener)[0]) {
             return true;
@@ -345,20 +300,30 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         return false;
     };
 
-    gpii.metadata.feedback.getCloseTooltip = function (model) {
-        return model.isTooltipOpen && model.isDialogOpen && model.isShareTarget;
-    };
+    gpii.metadata.feedback.computeStates = function (model) {
+        var isShareTargetFunc = model.isShareTargetFunc;
+        model = model.model;
+        var isShareTarget = isShareTargetFunc();
 
-    gpii.metadata.feedback.getRemoveDialogIndicator = function (model) {
-        return model.isTooltipOpen && model.isDialogOpen && !model.isShareTarget;
-    };
+        model.closeTooltip = false;
+        model.removeDialogIndicator = false;
+        model.addDialogIndicator = false;
+        model.removeTooltipIndicator = false;
 
-    gpii.metadata.feedback.getAddDialogIndicator = function (model) {
-        return !model.isTooltipOpen && model.isDialogOpen;
-    };
+        if (model.isTooltipOpen && model.isDialogOpen && isShareTarget) {
+            model.closeTooltip = true;
+        }
+        if (model.isTooltipOpen && model.isDialogOpen && !isShareTarget) {
+            model.removeDialogIndicator = true;
+        }
+        if (!model.isTooltipOpen && model.isDialogOpen) {
+            model.addDialogIndicator = true;
+        }
+        if (!model.isTooltipOpen && (!model.isDialogOpen || model.isDialogOpen && !isShareTarget)) {
+            model.removeTooltipIndicator = true;
+        }
 
-    gpii.metadata.feedback.getRemoveTooltipIndicator = function (model) {
-        return !model.isTooltipOpen && (!model.isDialogOpen || model.isDialogOpen && !model.isShareTarget);
+        return model;
     };
 
     gpii.metadata.feedback.closeTooltip = function (tooltip, closeTooltip) {
