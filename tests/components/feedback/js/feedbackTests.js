@@ -336,7 +336,7 @@ https://github.com/gpii/universal/LICENSE.txt
                 }]
             }]
         }, {
-            name: "Dialog & tooltiop interaction",
+            name: "Dialog & tooltip interaction",
             tests: [{
                 name: "Interaction between the dialog and the tooltip",
                 expect: 12,
