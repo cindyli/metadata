@@ -129,6 +129,22 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
                         "mismatchDetailsIcon": {
                             label: "mismatchDetailsLabel",
                             selectorForIndicatorStyle: "mismatchDetailsButton"
+                        },
+                        "textIcon": {
+                            label: "textLabel",
+                            selectorForIndicatorStyle: "textButton"
+                        },
+                        "captionIcon": {
+                            label: "captionLabel",
+                            selectorForIndicatorStyle: "captionButton"
+                        },
+                        "transcriptIcon": {
+                            label: "transcriptLabel",
+                            selectorForIndicatorStyle: "transcriptButton"
+                        },
+                        "audioIcon": {
+                            label: "audioLabel",
+                            selectorForIndicatorStyle: "audioButton"
                         }
                     },
                     listeners: {
@@ -160,6 +176,10 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
         },
         databaseName: "feedback",
         strings: {
+            textLabel: "Texts are available",
+            captionLabel: "Captions are available",
+            transcriptLabel: "Transcripts are available for 1/2 videos",
+            audioLabel: "Audios are not available",
             matchConfirmationLabel: "I like this article, match me with similar content.",
             mismatchDetailsLabel: "I don't like this article, request improvements.",
             requestLabel: "Request improvements to the content."
@@ -170,6 +190,14 @@ https://github.com/fluid-project/infusion/raw/master/Infusion-LICENSE.txt
             openIndicator: "gpii-icon-arrow"
         },
         selectors: {
+            textButton: ".gpiic-text-button",
+            textIcon: "#gpiic-text-icon",
+            captionButton: ".gpiic-caption-button",
+            captionIcon: "#gpiic-caption-icon",
+            transcriptButton: ".gpiic-transcript-button",
+            transcriptIcon: "#gpiic-transcript-icon",
+            audioButton: ".gpiic-audio-button",
+            audioIcon: "#gpiic-audio-icon",
             matchConfirmationButton: ".gpiic-matchConfirmation-button",
             matchConfirmationIcon: "#gpiic-matchConfirmation-icon",
             mismatchDetailsButton: ".gpiic-mismatchDetails-button",

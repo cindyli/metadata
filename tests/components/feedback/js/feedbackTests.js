@@ -381,6 +381,41 @@ https://github.com/gpii/universal/LICENSE.txt
                     changeEvent: "{feedback}.applier.modelChanged"
                 }]
             }]
+        }, {
+            name: "Metadata buttons",
+            tests: [{
+                name: "Tooltips for metadata buttons",
+                expect: 8,
+                sequence: [{
+                    element: "{feedback}.dom.textIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertTooltipState",
+                    args: ["{feedback}", "{feedback}.options.selectors.textButton"],
+                    event: "{feedback}.events.afterTooltipOpen"
+                }, {
+                    element: "{feedback}.dom.captionIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertTooltipState",
+                    args: ["{feedback}", "{feedback}.options.selectors.captionButton"],
+                    event: "{feedback}.events.afterTooltipOpen"
+                }, {
+                    element: "{feedback}.dom.transcriptIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertTooltipState",
+                    args: ["{feedback}", "{feedback}.options.selectors.transcriptButton"],
+                    event: "{feedback}.events.afterTooltipOpen"
+                }, {
+                    element: "{feedback}.dom.audioIcon",
+                    jQueryTrigger: "focus"
+                }, {
+                    listener: "gpii.tests.assertTooltipState",
+                    args: ["{feedback}", "{feedback}.options.selectors.audioButton"],
+                    event: "{feedback}.events.afterTooltipOpen"
+                }]
+            }]
         }]
     });
 

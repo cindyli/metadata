@@ -98,7 +98,7 @@ _:-ms-fullscreen, .gpii-icon.gpii-icon-unavailable:after {
     content: "\e601";
 }
 
-.gpii-icon-captions:before {
+.gpii-icon-caption:before {
     content: "\e602";
 }
 
